@@ -24,12 +24,11 @@ import com.example.descuentosapp.components.MainButton
 import com.example.descuentosapp.components.MainTextField
 import com.example.descuentosapp.components.SpacerH
 import com.example.descuentosapp.components.TwoCards
-import com.example.descuentosapp.viewModel.CalcularViewModel1
 import com.example.descuentosapp.viewModel.CalcularViewModel2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(viewModel1: CalcularViewModel1){
+fun HomeView2(viewModel2: CalcularViewModel2){
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -39,68 +38,53 @@ fun HomeView(viewModel1: CalcularViewModel1){
                 )
             )
         }) {
-        ContentHomeView(it, viewModel1)
+        ContentHomeView2(it, viewModel2)
     }
 }
 
 @Composable
-fun ContentHomeView(paddingValues: PaddingValues, viewModel1: CalcularViewModel1){
+fun ContentHomeView2(paddingValues: PaddingValues, viewModel2: CalcularViewModel2){
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .padding(10.dp)
             .fillMaxSize(),
-            //verticalArrangement = Arrangement.Center,
+        //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var precio by remember { mutableStateOf("") }
-        var descuento by remember { mutableStateOf("") }
-
-        var precioDescuento by remember { mutableStateOf(0.0) }
-        var totalDescuento by remember { mutableStateOf(0.0) }
-
-        var viewAlert by remember { mutableStateOf(false) }
         TwoCards(
             title1 = "Total",
-            number1 = totalDescuento,
+            number1 = viewModel2.totalDescuento,
             title2 =  "Descuento",
-            number2 = precioDescuento
+            number2 = viewModel2.precioDescuento
         )
         MainTextField(
-            values = precio,
-            onValueChanges = {precio = it},
+            values = viewModel2.precio,
+            onValueChanges = {viewModel2.onValue(it, "precio")},
             label = "Precio"
         )
         SpacerH()
         MainTextField(
-            values = descuento,
-            onValueChanges = {descuento = it},
+            values = viewModel2.descuento,
+            onValueChanges = {viewModel2.onValue(it, "descuento")},
             label = "Descuento"
         )
         SpacerH(10.dp)
         MainButton(text = "Generar Descuento") {
-            val result = viewModel1.calcular(precio,descuento)
-            viewAlert = result.second.second
-            if(!viewAlert){
-                precioDescuento = result.first
-                totalDescuento = result.second.first
-            }
+            viewModel2.calcular()
         }
         SpacerH()
         MainButton(text = "Limpiar", color = Color.Red) {
-            precio = ""
-            descuento = ""
-            precioDescuento = 0.0
-            totalDescuento = 0.0
+            viewModel2.lipiar()
         }
 
-        if(viewAlert){
+        if(viewModel2.viewAlert){
             Alert(
                 title = "Alerta",
                 message = "Los Campos de precio y/ó descuento no pueden ir vacios",
                 confirmText = "Aceptar",
-                onConfirmClick = {viewAlert = false},
-                onDismissClick = {viewAlert = false}
+                onConfirmClick = { viewModel2.cancelAlert()},
+                onDismissClick = {false}
             )
         }
     }
